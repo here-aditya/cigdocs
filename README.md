@@ -11,6 +11,7 @@ Server Scripts - PHP 5
 Framework - CodeIgniter V 2.1.3
 Database - MySQL 5.1.41
 Client Script - jQuery V 1.8.3
+UI - Bootstrap framework for responsive
 
 Copy the whole 'cigdocs' folder to server root.
 
