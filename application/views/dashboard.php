@@ -216,17 +216,14 @@ $(document).ready(function()
 			r1 = r2;
 			r2 = temp;
 		}
-		
 		if(c1 > c2)
 		{
 			temp = c1;
 			c1 = c2;
 			c2 = temp;
 		}
-		
 		// initialize globals
 		selRowStart = dragStartRow; selRowEnd = r2; selColStart = c1; selColEnd = c2;
-		
 		// select range of cells	
 		temp = c1;	
 		while(r1 <= r2)
@@ -249,10 +246,8 @@ $(document).ready(function()
 			c1 = c2;
 			c2 = temp;
 		}
-		
 		// initialize globals
 		selRowStart = 1; selRowEnd = rowTotIndex; selColStart = c1; selColEnd = c2;
-		
 		while(c1 <= c2)
 		{
 			$('table tr td:nth-child(' + (c1 + 1) + ')').addClass("highlighted");
@@ -267,27 +262,22 @@ $(document).ready(function()
 		var curobj = $(this);
 		var curCol = $(this).index();
 		var curRow = $(this).closest('tr').index();
-		
 		dragStartRow = curRow;
 		dragStartCol = curCol == 0 ? 1 : curCol;
-		
 		// reset all selected td
 		unSelectAll();
-		
 		// select a Row
 		if (curCol == 0) {
 			selectRange(dragStartRow, dragStartCol, dragStartRow, colTotIndex);
 		} else {	// select a Cell
 			curobj.addClass("selstart highlighted");
 		}
-		
 		return false; 
-	  })	// Mouse DragOver
+	  })	// Mouse DragOver on td
 	  .mouseover(function () {
 		if (isMouseDown) {
 			var curCol = $(this).index();
 			var curRow = $(this).closest('tr').index();
-			
 			if(curCol == 0 || dragStartCol == 0){
 				selectRange(curRow, 1, curRow, colTotIndex);
 			}
@@ -302,6 +292,7 @@ $(document).ready(function()
 	  });
 	  
 	  
+	// header row clicked  
 	$("table thead th").mousedown(function () {
 		isMouseDown = true;
 		var curCol = $(this).index();
@@ -317,7 +308,7 @@ $(document).ready(function()
 			selectColumnRange(curCol, curCol);
 		}
 		return false;
-	})
+	})	// Mouse DragOver on th
 	.mouseover(function () {
 		if (isMouseDown) {
 			var curCol = $(this).index();
@@ -328,51 +319,50 @@ $(document).ready(function()
 		return false; // prevent text selection in IE
 	  });
   
-  
+  	// mouse up
 	$(document).mouseup(function () {
 		isMouseDown = false;
 	  });
 	 
 	 
+	// plot chart button is clicked
 	$('#plotChart').click(function() {
 		var jsondata = '{"chart":{"caption" : "Fusion Chart Report", "xAxisName" : "X - Axis", "yAxisName" : "Y - Axis"}, "data" : [';
 		var loopData = new Array();	
-		var innerData = '';		
-					
+		var innerData = '';
+		// find out selected rows and columns
+		// prepare Data for JSON string from it
 		for(var r1 = selRowStart; r1 <= selRowEnd; r1++)
 		{
-			//if(r1 != selRowStart && innerData != '') 
-				//jsondata += ', ';
-			
 			var counter = 0;
 			innerData = '';
-						
 			for(var c1 = selColStart; c1 <= selColEnd; c1++)
 			{	
 				var cellval = $('table tbody tr').eq(r1).find('td').eq(c1).text();
-				
 				if( $.trim( cellval ) != '' )
 				{
 					innerData += (counter % 2) == 0 ? '"label" : "' + cellval + '", ' : '"value" : "' + cellval + '" ';
 					counter++;
 				}
 			}
-			
 			if( innerData != '')
 				jsondata += '{' + innerData + '}, ';
 		}
-		
 		jsondata = jsondata.slice(0,-2);
 		jsondata += '] }';
-		
+		// update chart with JSON string for selected range of table
 		$("#chartContainer").updateFusionCharts({"dataSource": jsondata});
 		console.log(jsondata);
 	});
 	
+	
+	// on drop down change for chart type
 	$('#charttype').change(function() {
 		$("#chartContainer").updateFusionCharts({"swfUrl": $(this).val()});
 	});
 	
+	
+	// insert a fusion chart as page is loaded
 	$("#chartContainer").insertFusionCharts({
         swfUrl: "<?=$RPath?>Charts/Spline.swf", 
         width: "270", 
